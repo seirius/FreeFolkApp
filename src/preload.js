@@ -1,11 +1,11 @@
 const { dialog } = require("electron").remote;
 const fs = require("fs");
 const path = require("path");
-
-console.log("Hello world");
+const ffmpeg = require("fluent-ffmpeg");
 
 window.electron = {
     dialog,
     fs,
-    path
+    path,
+    ffmpeg
 };
