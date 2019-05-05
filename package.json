@@ -6,7 +6,8 @@
     "dependencies": {
         "@microlink/youtube-dl": "^1.13.2",
         "fluent-ffmpeg": "^2.1.2",
-        "googleapis": "^39.2.0"
+        "googleapis": "^39.2.0",
+        "ytdl-core": "^0.29.1"
     },
     "devDependencies": {
         "electron": "^5.0.0"
