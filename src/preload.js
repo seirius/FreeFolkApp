@@ -92,7 +92,6 @@ function removeItems(args) {
             });
         }));
     });
-    console.log(promises);
     return Promise.all(promises);
 }
 
@@ -104,6 +103,23 @@ function removeVideosContent(args) {
         fileTypes.forEach(fileType => filePaths.push(path.join(savePath, safeTitle + fileType)));
     });
     return removeItems({filePaths});
+}
+
+async function getItemDiskInformation(args) {
+    const {title, filePath, fileTypes} = args;
+    const info = {};
+    if (title && filePath && fileTypes) {
+        const safeTitle = safeFilename(title);
+        await Promise.all(fileTypes.map(async fileType => {
+            try {
+                await fs.promises.access(path.join(filePath, safeTitle + fileType));
+                info[fileType] = true;
+            } catch(error) {
+                info[fileType] = false;
+            }
+        }));
+    }
+    return info;
 }
 
 
@@ -118,7 +134,8 @@ window.electron = {
         downloadVideo,
         downloadMusic,
         removeItems,
-        removeVideosContent
+        removeVideosContent,
+        getItemDiskInformation
     },
     setImmediate
 };
