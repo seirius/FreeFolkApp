@@ -22,10 +22,12 @@ function getPlaylist(url) {
                     const items = response.data.items.map(oItem => {
                         const url = new URL("https://www.youtube.com/watch");
                         url.searchParams.append("v", oItem.snippet.resourceId.videoId);
+                        const { snippet } = oItem;
+                        const { thumbnails } = snippet;
                         return {
-                            title: oItem.snippet.title,
+                            title: snippet.title,
                             video_url: url.href,
-                            thumbnail_url: oItem.snippet.thumbnails.high.url
+                            thumbnail_url: thumbnails ? thumbnails.high.url : ''
                         };
                     });
                     resolve(items);
@@ -50,27 +52,57 @@ function getBasicInfo(args) {
 
 function downloadVideo(args) {
     return new Promise((resolve, reject) => {
-        const {videoUrl, videoTitle, savePath} = args;
+        const {videoUrl, videoTitle, savePath, downloadProgressCallback} = args;
         const vid = ytdl(videoUrl);
         vid.pipe(fs.createWriteStream(path.join(savePath, safeFilename(videoTitle) + ".mp4")));
-        vid.on("response", resolve).on("error", reject);
+        vid.on("response", response => {
+            if (downloadProgressCallback) {
+                let dataRead = 0;
+                const contentLength = response.headers["content-length"];
+                response.on("data", data => {
+                    dataRead += data.length;
+                    downloadProgressCallback({
+                        progress: dataRead / contentLength * 100,
+                        contentLength
+                    });
+                });
+            }
+            response.on("end", resolve);
+        }).on("error", reject);
     });
 }
 
 function downloadMusic(args) {
     return new Promise((resolve, reject) => {
-        const {savePath, videoTitle, videourl} = args;
-        downloadVideo(args)
+        const {savePath, videoTitle, videoUrl, downloadProgressCallback} = args;
+        let dataRead = 0;
+        downloadVideo({
+            savePath, 
+            videoTitle, 
+            videoUrl,
+            downloadProgressCallback: callbackArgs => {
+                dataRead = (callbackArgs.progress / 2);
+                downloadProgressCallback({
+                    progress: dataRead
+                });
+            }
+        })
         .then(response => {
             const fileName = safeFilename(videoTitle);
             const videoPath = path.join(savePath, `${fileName}.mp4`);
             const mp3Path = path.join(savePath, `${fileName}.mp3`);
             ffmpeg(videoPath)
             .format("mp3")
+            .on("progress", progress => {
+                dataRead += (progress.percent / 2);
+                downloadProgressCallback({
+                    progress: dataRead
+                });
+            })
             .save(mp3Path)
             .on("end", () => fs.unlink(videoPath, err => err ? reject(err) : resolve()))
             .on("error", reject);
-        }).catch(reject)
+        }).catch(reject);
     });
 }
 

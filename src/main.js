@@ -12,7 +12,7 @@ function createWindow() {
 
     win.loadFile('web-dist/index.html');
 
-    win.webContents.openDevTools();
+    // win.webContents.openDevTools();
 }
 
 app.on('ready', createWindow);
