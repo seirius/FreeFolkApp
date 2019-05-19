@@ -7,6 +7,8 @@ const youtube = google.youtube("v3");
 const CREDENTIALS = require("../FreefolkCredentials.json");
 const ytdl = require("ytdl-core");
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 function getPlaylist(url) {
     return new Promise((resolve, reject) => {
         youtube.playlistItems.list({
@@ -169,5 +171,9 @@ window.electron = {
         removeVideosContent,
         getItemDiskInformation
     },
-    setImmediate
+    setImmediate,
+    init: {
+        videoSearch: isProduction ? "" : "https://www.youtube.com/playlist?list=PLpqYk0rZC57pQiwfY76azyhe_k8f_EJU0",
+        path: isProduction ? "" : "/home/andriy/Downloads"
+    }
 };
