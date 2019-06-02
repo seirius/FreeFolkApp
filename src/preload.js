@@ -154,6 +154,40 @@ async function getItemDiskInformation(args) {
     return info;
 }
 
+function getAvailableFormats() {
+    return new Promise((resolve, reject) => {
+        ffmpeg.getAvailableFormats((err, formats) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(formats);
+            }
+        });
+    });
+}
+
+function toFormat(args) {
+    const {inputFile, outputFile, format, progressCallback} = args;
+    return new Promise((resolve, reject) => {
+        if (!inputFile || !outputFile || !format) {
+            reject("Input file, output file or format no defined");
+            return;
+        }
+        const ff = ffmpeg(inputFile);
+        if (progressCallback) {
+            ff.on("progress", progress => {
+                progressCallback({
+                    progress: progress.percent
+                });
+            });
+        }
+        ff
+        .save(outputFile)
+        .on("end", resolve)
+        .on("error", reject);
+    })
+}
+
 
 window.electron = {
     dialog,
@@ -167,11 +201,15 @@ window.electron = {
         downloadMusic,
         removeItems,
         removeVideosContent,
-        getItemDiskInformation
+        getItemDiskInformation,
+        getAvailableFormats
     },
     setImmediate,
     init: {
         videoSearch: "",
         path: ""
+    },
+    formats: {
+        to: toFormat
     }
 };
