@@ -228,6 +228,9 @@ const userFile = path.join(userDir, "config.json");
 let userConfig;
 
 async function getUserConfig() {
+    if (userConfig) {
+        return Promise.resolve(userConfig);
+    }
     try {
         await fs.promises.access(userDir);
     } catch(error) {
@@ -244,7 +247,7 @@ async function getUserConfig() {
     } catch(error) {
         return Promise.reject(error);
     }
-    return userConfig;
+    return Promise.resolve(userConfig);
 }
 
 async function saveUserConfig(config) {
@@ -283,7 +286,6 @@ window.electron = {
     },
     config: {
         getUserConfig,
-        userConfig: () => userConfig,
         saveUserConfig,
         saveCurrentUserConfig
     }

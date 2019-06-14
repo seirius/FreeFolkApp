@@ -1,0 +1,9 @@
+{
+    "dest": "release-builds/installers/",
+    "icon": "free-folk-resources/tormund.ico",
+    "src": "release-builds/free-folk-win32-x64/",
+    "arch": "x64",
+    "options": {
+        "productName": "free-folk"
+    }
+  }
