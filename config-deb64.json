@@ -1,0 +1,9 @@
+{
+    "dest": "release-builds/installers/",
+    "icon": "free-folk-resources/tormund.png",
+    "src": "release-builds/free-folk-linux-x64/",
+    "arch": "amd64",
+    "options": {
+        "productName": "free-folk"
+    }
+  }

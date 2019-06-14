@@ -1,7 +1,15 @@
 const { dialog } = require("electron").remote;
+const isDev = require("electron-is-dev");
 const fs = require("fs");
+const os = require("os");
 const path = require("path");
 const ffmpeg = require("fluent-ffmpeg");
+const resourcesPath = isDev ? "ffmpeg-src": process.resourcesPath;
+if (process.platform === "linux") {
+    ffmpeg.setFfmpegPath(path.join(resourcesPath, "debian-64/ffmpeg"));
+} else if (process.platform === "win32") {
+    ffmpeg.setFfmpegPath(path.join(resourcesPath, "win-64/bin/ffmpeg"));
+}
 const {google} = require("googleapis");
 const youtube = google.youtube("v3");
 const CREDENTIALS = require("../FreefolkCredentials.json");
@@ -34,19 +42,39 @@ function getPlaylist(url) {
                 }
             }
         });
+
     });
 }
 
-function getBasicInfo(args) {
+function getVideoInfo(args) {
+    const {videoUrl} = args;
     return new Promise((resolve, reject) => {
-        const {videoUrl} = args;
-        ytdl(videoUrl, (err, info) => {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(info);
-            }
-        });
+        const url = new URL(videoUrl);
+        const id = url.searchParams.get("v");
+        if (id) {
+            youtube.videos.list({
+                key: CREDENTIALS.apiKey,
+                part: "snippet",
+                id: id
+            }, (err, result) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    const data = result.data;
+                    if (data && data.items && data.items.length === 1) {
+                        const videoInfo = data.items[0];
+                        const thumbnails = videoInfo.snippet.thumbnails;
+                        resolve({
+                            title: videoInfo.snippet.title,
+                            video_url: videoUrl,
+                            thumbnail_url: thumbnails ? thumbnails.high.url : ""
+                        });
+                    }
+                }
+            });
+        } else {
+            reject("ID not found");
+        }
     });
 }
 
@@ -188,6 +216,47 @@ function toFormat(args) {
     })
 }
 
+const userConfigDefault = {
+    setPath: "",
+    videoUrl: "",
+    videoList: []
+};
+
+const userDir = path.join(os.homedir(), "free-folk");
+const userFile = path.join(userDir, "config.json");
+
+let userConfig;
+
+async function getUserConfig() {
+    try {
+        await fs.promises.access(userDir);
+    } catch(error) {
+        await fs.promises.mkdir(userDir);
+    }
+    try {
+        await fs.promises.access(userFile);
+    } catch(error) {
+        await fs.promises.writeFile(userFile, JSON.stringify(userConfigDefault, null, 2));
+        userConfig = userConfigDefault;
+    }
+    try {
+        userConfig = JSON.parse(await fs.promises.readFile(userFile));
+    } catch(error) {
+        return Promise.reject(error);
+    }
+    return userConfig;
+}
+
+async function saveUserConfig(config) {
+    await fs.promises.writeFile(userFile, JSON.stringify(config, null, 2));
+}
+
+async function saveCurrentUserConfig() {
+    if (!userConfig) {
+        userConfig = await getUserConfig();
+    }
+    await saveUserConfig(userConfig);
+}
 
 window.electron = {
     dialog,
@@ -196,7 +265,7 @@ window.electron = {
     ffmpeg,
     google: {
         getPlaylist,
-        getBasicInfo,
+        getVideoInfo,
         downloadVideo,
         downloadMusic,
         removeItems,
@@ -211,5 +280,11 @@ window.electron = {
     },
     formats: {
         to: toFormat
+    },
+    config: {
+        getUserConfig,
+        userConfig: () => userConfig,
+        saveUserConfig,
+        saveCurrentUserConfig
     }
 };

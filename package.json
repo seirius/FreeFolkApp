@@ -1,23 +1,26 @@
 {
     "name": "freefolkapp",
     "version": "1.0.0",
-    "description": "",
+    "description": "App for the free folk",
     "main": "src/main.js",
     "dependencies": {
-        "@microlink/youtube-dl": "^1.13.2",
+        "@microlink/youtube-dl": "^1.13.5",
+        "electron-is-dev": "^1.1.0",
         "fluent-ffmpeg": "^2.1.2",
         "googleapis": "^39.2.0",
-        "ytdl-core": "^0.29.1"
+        "ytdl-core": "^0.29.2"
     },
     "devDependencies": {
-        "electron": "^5.0.0",
+        "electron": "^5.0.3",
+        "electron-installer-debian": "^2.0.0",
         "electron-packager": "^13.1.1"
     },
     "scripts": {
         "start": "electron .",
         "package-mac": "electron-packager . --overwrite --platform=darwin --arch=x64 --icon=assets/icons/mac/icon.icns --prune=true --out=release-builds",
-        "package-win": "electron-packager . free-folk --overwrite --asar=true --platform=win32 --arch=ia32 --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"free-folk\"",
-        "package-linux": "electron-packager . free-folk --overwrite --asar=true --platform=linux --arch=x64 --icon=assets/icons/png/1024x1024.png --prune=true --out=release-builds"
+        "package-win": "electron-packager . --executable-name=freefolkapp free-folk --extra-resource=ffmpeg-src/win-64 --overwrite --asar=true --platform=win32 --arch=ia32 --prune=true --out=release-builds --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"free-folk\"",
+        "package-linux": "electron-packager . --executable-name=freefolkapp free-folk --extra-resource=ffmpeg-src/debian-64 --overwrite --asar=true --platform=linux --arch=x64  --prune=true --icon=free-folk-resources/tormund.png --prune=true --out=release-builds",
+        "deb64": "electron-installer-debian --config config-deb64.json"
     },
     "repository": {
         "type": "git",
