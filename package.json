@@ -9,6 +9,7 @@
         "electron-squirrel-startup": "^1.0.0",
         "fluent-ffmpeg": "^2.1.2",
         "googleapis": "^39.2.0",
+        "webtorrent": "^0.103.4",
         "ytdl-core": "^0.29.2"
     },
     "devDependencies": {
