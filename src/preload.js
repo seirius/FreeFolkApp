@@ -15,6 +15,8 @@ const youtube = google.youtube("v3");
 const CREDENTIALS = require("../FreefolkCredentials.json");
 const ytdl = require("ytdl-core");
 
+const WebTorrent = require("webtorrent");
+
 function getPlaylist(url) {
     return new Promise((resolve, reject) => {
         youtube.playlistItems.list({
@@ -261,6 +263,31 @@ async function saveCurrentUserConfig() {
     await saveUserConfig(userConfig);
 }
 
+
+const clientTorrent = new WebTorrent();
+
+function addTorrent(args) {
+    const {magnetLink, added, download} = args;
+    clientTorrent.add(magnetLink, torrent => {
+        if (added) {
+            added({
+                name: torrent.name,
+                hash: torrent.infoHash
+            });
+        }
+        if (download) {
+            torrent.on("download", bytes => {
+                download({
+                    progress: torrent.progress * 100,
+                    speed: torrent.downloadSpeed / 1048576
+                });
+            });
+        }
+    });
+}
+
+
+
 window.electron = {
     dialog,
     fs,
@@ -288,5 +315,8 @@ window.electron = {
         getUserConfig,
         saveUserConfig,
         saveCurrentUserConfig
+    },
+    torrent: {
+        addTorrent
     }
 };
