@@ -25,10 +25,6 @@ function createWindow() {
             Object.assign(options, { width, height });
         }
     });
-
-    if (os === "win32") {
-        autoUpdater.checkForUpdatesAndNotify();
-    }
 }
 
 app.on('ready', createWindow);
