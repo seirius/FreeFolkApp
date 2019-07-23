@@ -1,6 +1,6 @@
 {
     "name": "freefolkapp",
-    "version": "1.0.2",
+    "version": "1.0.21",
     "description": "Free Folk app, for everyone and everything",
     "main": "src/main.js",
     "dependencies": {
