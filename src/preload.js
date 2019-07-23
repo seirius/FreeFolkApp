@@ -10,107 +10,13 @@ if (process.platform === "linux") {
 } else if (process.platform === "win32") {
     ffmpeg.setFfmpegPath(path.join(resourcesPath, "win-64/bin/ffmpeg"));
 }
-const { google } = require("googleapis");
-const youtube = google.youtube("v3");
-const CREDENTIALS = require("../FreefolkCredentials.json");
+
+const { YOUTUBE } = require("./libs/youtube");
 const ytdl = require("ytdl-core");
 
 const { WINDOW_MANAGER } = require("./window-manager");
 
 const WebTorrent = require("webtorrent");
-
-function getPlaylist(url) {
-    return new Promise((resolve, reject) => {
-        youtube.playlistItems.list({
-            key: CREDENTIALS.apiKey,
-            part: "id,snippet",
-            playlistId: url,
-            maxResults: 50
-        }, (err, response) => {
-            if (err) {
-                reject(err);
-            } else {
-                if (response.data && response.data.items) {
-                    const items = response.data.items.map(oItem => {
-                        const url = new URL("https://www.youtube.com/watch");
-                        url.searchParams.append("v", oItem.snippet.resourceId.videoId);
-                        const { snippet } = oItem;
-                        const { thumbnails } = snippet;
-                        return {
-                            title: snippet.title,
-                            video_url: url.href,
-                            thumbnail_url: thumbnails ? thumbnails.high.url : ''
-                        };
-                    });
-                    resolve(items);
-                }
-            }
-        });
-
-    });
-}
-
-function searchByText(text) {
-    return new Promise((resolve, reject) => {
-        youtube.search.list({
-            key: CREDENTIALS.apiKey,
-            part: "id, snippet",
-            q: text,
-            maxResults: 50
-        }, (err, response) => {
-            if (err) {
-                reject(err);
-            } else {
-                if (response.data && response.data.items) {
-                    const items = response.data.items.map(oItem => {
-                        const url = new URL("https://www.youtube.com/watch");
-                        url.searchParams.append("v", oItem.id.videoId);
-                        const { snippet } = oItem;
-                        const { thumbnails } = snippet;
-                        return {
-                            title: snippet.title,
-                            video_url: url.href,
-                            thumbnail_url: thumbnails ? thumbnails.high.url : ''
-                        };
-                    });
-                    resolve(items);
-                }
-            }
-        });
-    });
-}
-
-function getVideoInfo(args) {
-    const { videoUrl } = args;
-    return new Promise((resolve, reject) => {
-        const url = new URL(videoUrl);
-        const id = url.searchParams.get("v");
-        if (id) {
-            youtube.videos.list({
-                key: CREDENTIALS.apiKey,
-                part: "snippet",
-                id: id
-            }, (err, result) => {
-                if (err) {
-                    reject(err);
-                } else {
-                    const data = result.data;
-                    if (data && data.items && data.items.length === 1) {
-                        const videoInfo = data.items[0];
-                        const thumbnails = videoInfo.snippet.thumbnails;
-                        resolve({
-                            title: videoInfo.snippet.title,
-                            video_url: videoUrl,
-                            thumbnail_url: thumbnails ? thumbnails.high.url : ""
-                        });
-                    }
-                }
-            });
-        } else {
-            reject("ID not found");
-        }
-    });
-}
 
 function downloadVideo(args) {
     return new Promise((resolve, reject) => {
@@ -331,9 +237,7 @@ window.electron = {
     ffmpeg,
     WINDOW_MANAGER,
     google: {
-        getPlaylist,
-        searchByText,
-        getVideoInfo,
+        YOUTUBE,
         downloadVideo,
         downloadMusic,
         removeItems,

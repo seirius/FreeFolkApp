@@ -57,28 +57,35 @@ const path = require("path");
 //     }
 // });
 
+const { YOUTUBE } = require("./libs/youtube");
+// YOUTUBE.getByText({text: "league of legends"}).then(console.log).catch(console.error);
+// YOUTUBE.getPlaylist({id: "RDzeeTGeavRoc"}).then(console.log).catch(console.error);
+// YOUTUBE.getVideosInfo({ids: ["Ecsh90d9iJM","ijhYayfKCQI"]}).then(console.log).catch(console.error);
+
 // youtube.videos.list({
 //     key: "AIzaSyDt_dCzvULBfqX9k2r-9-XJ2nRiEEHhUqg",
-//     part: "snippet",
-//     id: "Ecsh90d9iJM"
+//     part: "snippet,contentDetails",
+//     id: "Ecsh90d9iJM,ijhYayfKCQI"
 // }, (err, result) => {
 //     if (err) {
 //         console.error(err);
 //     }
 //     if (result && result.data && result.data.items) {
-//         result.data.items.forEach(vid => console.log("video", vid));
+//         console.log(result.data.items[0]);
+//         console.log(result.data.items[1]);
+//         // result.data.items.forEach(vid => console.log("video", vid));
 //     }
 // });
 
-youtube.search.list({
-    part: "snippet",
-    key: CREDENTIALS.apiKey,
-    q: "nightcore",
-    maxResults: 50
-}, (err, result) => {
-    if (err) {
-        console.error(err);
-    } else {
-        console.log(result);
-    }
-});
+// youtube.search.list({
+//     part: "contentDetails,snippet,id",
+//     key: CREDENTIALS.apiKey,
+//     q: "nightcore",
+//     maxResults: 1
+// }, (err, result) => {
+//     if (err) {
+//         console.error(err);
+//     } else {
+//         console.log(result.data.items[0]);
+//     }
+// });
