@@ -61,3 +61,5 @@ typings/
 .next
 
 FreefolkCredentials.json
+
+web-dist/

@@ -1,7 +1,9 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, shell } = require('electron');
 const path = require("path");
 
 if (require("electron-squirrel-startup")) return;
+
+const os = require('os').platform();
 
 function createWindow() {
     let win = new BrowserWindow({
@@ -20,11 +22,12 @@ function createWindow() {
             const isVideo = url.indexOf("/mp4") > -1;
             let width = isVideo ? 1300 : 300;
             let height = isVideo ? 820 : 100;
-            Object.assign(options, {width, height});
+            Object.assign(options, { width, height });
+        } else if (frameName === "_blank") {
+            shell.openExternal(url);
+            event.preventDefault();
         }
-    })
-
-    // win.webContents.openDevTools();
+    });
 }
 
 app.on('ready', createWindow);
