@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, shell } = require('electron');
 const path = require("path");
 
 if (require("electron-squirrel-startup")) return;
@@ -23,6 +23,9 @@ function createWindow() {
             let width = isVideo ? 1300 : 300;
             let height = isVideo ? 820 : 100;
             Object.assign(options, { width, height });
+        } else if (frameName === "_blank") {
+            shell.openExternal(url);
+            event.preventDefault();
         }
     });
 }

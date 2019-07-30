@@ -141,6 +141,7 @@ window.electron = {
     fs,
     path,
     WINDOW_MANAGER,
+    meta: require("./meta").META,
     google: {
         YOUTUBE,
         removeItems
