@@ -1,6 +1,6 @@
 {
     "name": "freefolkapp",
-    "version": "1.0.22",
+    "version": "1.0.23",
     "description": "Free Folk app, for everyone and everything",
     "main": "src/main.js",
     "dependencies": {
@@ -9,6 +9,7 @@
         "electron-simple-updater": "^1.5.0",
         "electron-squirrel-startup": "^1.0.0",
         "fluent-ffmpeg": "^2.1.2",
+        "freefolkcommon": "git+https://github.com/seirius/FreeFolkCommon.git",
         "googleapis": "^39.2.0",
         "moment": "^2.24.0",
         "moment-duration-format": "^2.3.2",
