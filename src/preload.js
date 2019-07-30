@@ -142,6 +142,7 @@ window.electron = {
     path,
     WINDOW_MANAGER,
     meta: require("./meta").META,
+    util: require("freefolkcommon").UTIL,
     google: {
         YOUTUBE,
         removeItems
